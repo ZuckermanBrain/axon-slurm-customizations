@@ -1,0 +1,49 @@
+- name: Install sarchive
+  hosts: axon-head
+  become: yes
+  tags: sarchive
+  tasks:
+    - name: Check for current installation of sarchive
+      stat:
+        path: '/usr/bin/sarchive'
+      changed_when: false
+      register: sarchive_binary
+      # Need g++ for Kafka
+    - name: Install pre-requisites for building sarchive
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - epel-release
+        - rust
+        - cargo
+        - gcc-c++
+        - rpm-build
+      when: not sarchive_binary.stat.exists
+    - name: Clone down sarchive
+      git:
+        repo: https://github.com/itkovian/sarchive.git
+        dest: /tmp/sarchive
+        version: "47b77f61fb6553cc2c0dba8436ae16a861f4310f"
+      when: not sarchive_binary.stat.exists
+    - name: Build RPM for sarchive
+      command: "/tmp/sarchive/bdist_rpm.sh"
+      when: not sarchive_binary.stat.exists
+      args:
+        chdir: /tmp/sarchive
+    - name: Install sarchive
+      yum:
+        name: /tmp/sarchive/target/release/rpmbuild/RPMS/x86_64/sarchive-0.11.7-1.x86_64.rpm
+        state: present
+      when: not sarchive_binary.stat.exists
+    - name: Copy revised systemd service
+      copy:
+        src: files/sarchive.service
+        dest: /usr/lib/systemd/system/sarchive.service
+      when: not sarchive_binary.stat.exists
+    - name: Start and enable sarchive service
+      service:
+        name: sarchive
+        enabled: yes
+        state: started
+

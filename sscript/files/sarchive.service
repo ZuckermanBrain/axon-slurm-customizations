@@ -1,0 +1,13 @@
+[Unit]
+Description=Slurm job archival
+After=slurmctld.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/sarchive --cluster axon --scheduler slurm -s /var/spool/slurmctld file --archive /share/zrc/sys/sarchive -p daily
+Restart=always
+UMask=0006
+
+[Install]
+WantedBy=multi-user.target
+;Alias=sarchive.service
