@@ -1,5 +1,4 @@
 # SLURM MLFQ
-==============
 
  * Runs every minute as root on a login node (or any node where `scontrol` will work; might make sense to have it running on the same node as `slurmctld`).
  * Assumes the existence of 4 QoS levels (`expired`, `renters`, `owners`, and `eval`).  `eval` approximates the highest priority queue and is where jobs go immediately after they are submitted. After the max quanta for `eval` have been consumed, a job is sent to either the `renters` queue or the `owners` queue.  `owners` is higher priority than `renters`, and is for labs that have purchased an entire node on Axon.  `renters` is for labs that are renting capacity on the node owned by Zuckerman Research Computing (`ax08`).  In either of these queues, once 4 quanta have been used up a job will be demoted to the `expired` queue.  Once all jobs are in the `expired` queue, their state resets / all jobs are promoted back to the `eval` queue.  Some example code to set up the required QoS levels:
@@ -16,6 +15,7 @@ sacctmgr modify qos eval set priority=1000
 ```
 
  * As a caveat, because we're using QoS / not actually using a queue data structure with protective measures in place, it's possible that there could be overflow (i.e., if there are >= 90 jobs within the `owner` queue that haven't used up their 4 quanta, using the above code as an example).
+ * `sboost` is a bash function / wrapper that is sourced from `/etc/profile.d` and gives researchers the ability to manually push their jobs back into the `eval` queue.
 
 ## Why did we do this?
 
