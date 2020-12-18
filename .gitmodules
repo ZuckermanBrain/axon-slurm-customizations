@@ -1,3 +1,6 @@
 [submodule "ansible-slurm-scratchspace"]
 	path = ansible-slurm-scratchspace
 	url = https://github.com/ZuckermanBrain/ansible-slurm-scratchspace.git
+[submodule "sjupyter"]
+	path = sjupyter
+	url = git@github.com:ZuckermanBrain/sjupyter.git
