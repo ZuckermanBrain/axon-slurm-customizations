@@ -4,7 +4,7 @@ After=slurmctld.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/sarchive --cluster axon --scheduler slurm -s /var/spool/slurmctld file --archive /share/zrc/sys/sarchive -p daily
+ExecStart=/usr/bin/sarchive --cluster axon --scheduler slurm -s /var/spool/slurmctld file --archive /share/sarchive -p daily
 Restart=always
 UMask=0006
 
